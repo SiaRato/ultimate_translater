@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Learning Tool</title>
+
+<style>
+:root {
+    --page-bg-gradient: linear-gradient(-45deg, #ffdde1, #ee9ca7, #a1c4fd, #c2e9fb);
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --glass-input-bg: rgba(255, 255, 255, 0.4);
+    --primary: #007aff;
+    --on-primary: #ffffff;
+    --text: #1c1c1e;
+    --text-variant: #3a3a3c;
+    --example-bg: rgba(0, 122, 255, 0.1);
+    --synonym: #34c759;
+    --antonym: #ff3b30;
+    --collocation: #af52de;
+}
+
+[data-theme="dark"] {
+    --page-bg-gradient: linear-gradient(-45deg, #1c1c1e, #2c2c2e, #1a2a3a, #2a1a3a);
+    --glass-bg: rgba(30, 30, 30, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --glass-input-bg: rgba(0, 0, 0, 0.25);
+    --primary: #0a84ff;
+    --on-primary: #ffffff;
+    --text: #f2f2f7;
+    --text-variant: #ebebf5;
+    --example-bg: rgba(10, 132, 255, 0.15);
+    --synonym: #32d74b;
+    --antonym: #ff453a;
+    --collocation: #bf5af2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--page-bg-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text);
+    transition: color 0.3s ease;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.theme-toggle {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.05);
+    background: var(--glass-input-bg);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    padding: 30px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    overflow-y: auto;
+    max-height: 80vh;
+    transition: all 0.3s ease;
+}
+
+textarea {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    padding: 16px;
+    font-size: 16px;
+    font-family: inherit;
+    background: var(--glass-input-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 100px;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-top: 10px;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 4px 14px 0 rgba(0, 122, 255, 0.39);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.5);
+}
+
+.icon-btn {
+    padding: 10px;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--glass-input-bg);
+    color: var(--text);
+    box-shadow: none;
+    border: 1px solid var(--glass-border);
+}
+
+.icon-btn:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: 0 4px 14px 0 rgba(0, 122, 255, 0.39);
+}
+
+.translation-box {
+    min-height: 220px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px;
+    white-space: pre-wrap;
+    background: var(--glass-input-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.word {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.ipa {
+    color: var(--primary);
+    margin-top: 8px;
+    font-size: 18px;
+}
+
+.definition {
+    margin-top: 15px;
+    line-height: 1.5;
+}
+
+.vocab-section {
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.synonyms strong { color: var(--synonym); }
+.antonyms strong { color: var(--antonym); }
+.collocations strong { color: var(--collocation); }
+
+.examples {
+    margin-top: 15px;
+    background: var(--example-bg);
+    padding: 16px;
+    border-left: 4px solid var(--primary);
+    border-radius: 8px 16px 16px 8px;
+    transition: background 0.3s ease;
+}
+
+.examples h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: var(--primary);
+}
+
+.examples ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.examples li {
+    margin-bottom: 6px;
+    font-style: italic;
+    color: var(--text-variant);
+}
+
+.ipa-box {
+    margin-top: 15px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--example-bg);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-family: monospace, sans-serif;
+    font-size: 16px;
+    display: none;
+}
+
+.loading { color: var(--text-variant); font-style: italic; }
+.error { color: var(--antonym); font-weight: bold; }
+
+#pronounceBtn {
+    display: none;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--glass-border);
+    margin: 24px 0;
+}
+
+@media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .header-container { flex-direction: column; gap: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-container">
+        <h1>English Learning Tool</h1>
+        <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode">
+            <span id="themeIcon">🌙</span>
+        </button>
+    </div>
+
+    <div class="grid">
+        <!-- English Input Card -->
+        <div class="card">
+            <h2>English</h2>
+            <textarea id="inputText" placeholder="Type English text here..."></textarea>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <button onclick="translateText()">Translate</button>
+                <button onclick="speakEnglish()">🔊 English</button>
+                <button class="icon-btn" onclick="startDictation()" title="Voice Typing (Speak)">🎤</button>
+                <button class="icon-btn" onclick="clearText()" title="Clear Text">❌</button>
+            </div>
+
+            <div id="spokenIpaResult" class="ipa-box"></div>
+
+            <hr>
+
+            <h3>Dictionary (Double-click any word!)</h3>
+            <div id="dictionaryResult">Start typing or double-click a word...</div>
+            <button id="pronounceBtn" onclick="playPronunciation()">🔊 Pronunciation</button>
+        </div>
+
+        <!-- Translation Card -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Vietnamese Translation</h2>
+                <button class="icon-btn" onclick="copyTranslation()" title="Copy Translation">📋</button>
+            </div>
+            <div id="translationResult" class="translation-box"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeIcon').innerText = '☀️';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('themeIcon').innerText = '🌙';
+    }
+}
+
+function toggleTheme() {
+    const root = document.documentElement;
+    if (root.getAttribute('data-theme') === 'dark') {
+        root.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('themeIcon').innerText = '🌙';
+    } else {
+        root.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('themeIcon').innerText = '☀️';
+    }
+}
+
+// Initialize theme on load
+initTheme();
+
+const inputText = document.getElementById("inputText");
+let debounceTimer;
+let currentAudioUrl = null;
+let currentWord = null;
+let activeLookupWord = "";
+
+// Useless grammar words we want to filter out of our collocations
+const stopWords = new Set([
+    'is','are','was','were','and','or','but','in','on','at','to','for','with',
+    'by','about','as','of','the','a','an','it','this','that','he','she','they',
+    'we','you','i','be','has','have','had','do','does','did','not','from',
+    'can','could','would','should','will','their','my','your','his','her','our'
+]);
+
+inputText.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const firstWord = inputText.value.trim().split(/\s+/)[0].replace(/[^\w']/g, "").toLowerCase();
+        lookupDictionary(firstWord);
+        translateText(); // Auto-translate as you type
+    }, 800); // Slightly longer delay for auto-translate
+});
+
+// Detect double-click or highlight to lookup specific words
+inputText.addEventListener("mouseup", () => {
+    setTimeout(() => {
+        const selection = window.getSelection().toString().trim();
+        // Only lookup if it's a single word
+        if (selection && selection.split(/\s+/).length === 1) {
+            const word = selection.replace(/[^\w']/g, "").toLowerCase();
+            if (word !== activeLookupWord && word.length > 0) {
+                lookupDictionary(word);
+            }
+        }
+    }, 10);
+});
+
+async function lookupDictionary(targetWord) {
+    const text = inputText.value.trim();
+
+    if (!text) {
+        document.getElementById("dictionaryResult").innerHTML = "Start typing or double-click a word...";
+        document.getElementById("pronounceBtn").style.display = "none";
+        activeLookupWord = "";
+        return;
+    }
+
+    const wordToSearch = targetWord || text.split(/\s+/)[0].replace(/[^\w']/g, "").toLowerCase();
+
+    if (!wordToSearch) return;
+    
+    activeLookupWord = wordToSearch;
+
+    document.getElementById("dictionaryResult").innerHTML = `<div class="loading">Looking up "${wordToSearch}"...</div>`;
+
+    try {
+        // 1. Fetch Dictionary Data
+        const dictResponse = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordToSearch}`);
+        const dictData = await dictResponse.json();
+
+        if (!Array.isArray(dictData)) throw new Error("Word not found");
+
+        const primaryEntry = dictData[0];
+
+        let ipa = primaryEntry.phonetic || "";
+        if (!ipa && primaryEntry.phonetics) {
+            const phonetic = primaryEntry.phonetics.find(p => p.text);
+            ipa = phonetic?.text || "";
+        }
+
+        const audioObj = primaryEntry.phonetics?.find(p => p.audio);
+        currentAudioUrl = audioObj?.audio || null;
+        currentWord = primaryEntry.word;
+
+        const definition = primaryEntry.meanings?.[0]?.definitions?.[0]?.definition || "No definition available";
+
+        let rawSynonyms = [];
+        let rawAntonyms = [];
+        let rawExamples = [];
+
+        // Loop through ALL dictionary entries and meanings to maximize examples
+        dictData.forEach(entry => {
+            if (entry.synonyms) rawSynonyms.push(...entry.synonyms);
+            if (entry.antonyms) rawAntonyms.push(...entry.antonyms);
+
+            entry.meanings?.forEach(meaning => {
+                if (meaning.synonyms) rawSynonyms.push(...meaning.synonyms);
+                if (meaning.antonyms) rawAntonyms.push(...meaning.antonyms);
+                
+                meaning.definitions?.forEach(def => {
+                    if (def.example) {
+                        // Capitalize the first letter of the example for neatness
+                        const cleanExample = def.example.charAt(0).toUpperCase() + def.example.slice(1);
+                        rawExamples.push(cleanExample);
+                    }
+                });
+            });
+        });
+
+        const synonyms = [...new Set(rawSynonyms)].slice(0, 5);
+        const antonyms = [...new Set(rawAntonyms)].slice(0, 5);
+        const examples = [...new Set(rawExamples)].slice(0, 3); // Grab up to 3 unique examples
+
+        // 2. Fetch Better Collocations with Stop-Word Filtering
+        let collocations = [];
+        try {
+            const bgbRes = await fetch(`https://api.datamuse.com/words?rel_bgb=${wordToSearch}&max=15`);
+            const bgbData = await bgbRes.json();
+
+            const bgaRes = await fetch(`https://api.datamuse.com/words?rel_bga=${wordToSearch}&max=15`);
+            const bgaData = await bgaRes.json();
+
+            let validCombos = [];
+
+            bgbData.forEach(item => {
+                if (!stopWords.has(item.word.toLowerCase()) && /^[a-z]+$/.test(item.word)) {
+                    validCombos.push(`${item.word} ${wordToSearch}`);
+                }
+            });
+
+            bgaData.forEach(item => {
+                if (!stopWords.has(item.word.toLowerCase()) && /^[a-z]+$/.test(item.word)) {
+                    validCombos.push(`${wordToSearch} ${item.word}`);
+                }
+            });
+
+            collocations = [...new Set(validCombos)].slice(0, 6);
+        } catch (err) {
+            console.error("Could not fetch collocations", err);
+        }
+
+        // Build HTML Elements
+        const synonymsHtml = synonyms.length > 0 
+            ? `<div class="vocab-section synonyms"><strong>Synonyms:</strong> ${synonyms.join(', ')}</div>` : '';
+            
+        const antonymsHtml = antonyms.length > 0 
+            ? `<div class="vocab-section antonyms"><strong>Antonyms:</strong> ${antonyms.join(', ')}</div>` : '';
+
+        const collocationsHtml = collocations.length > 0
+            ? `<div class="vocab-section collocations"><strong>Common Collocations:</strong> ${collocations.join(', ')}</div>` : '';
+
+        const examplesHtml = examples.length > 0
+            ? `<div class="examples"><h4>Examples:</h4><ul>${examples.map(ex => `<li>${ex}</li>`).join('')}</ul></div>` : '';
+
+        // Update UI
+        document.getElementById("pronounceBtn").style.display = "inline-block";
+        document.getElementById("dictionaryResult").innerHTML = `
+            <div class="word">${primaryEntry.word}</div>
+            <div class="ipa">${ipa || "IPA not available"}</div>
+            <div class="definition">${definition}</div>
+            ${synonymsHtml}
+            ${antonymsHtml}
+            ${collocationsHtml}
+            ${examplesHtml}
+        `;
+
+    } catch (e) {
+        document.getElementById("dictionaryResult").innerHTML = '<div class="error">Word not found. Try checking your spelling.</div>';
+        document.getElementById("pronounceBtn").style.display = "none";
+    }
+}
+
+async function translateText() {
+    const text = inputText.value.trim();
+    if (!text) return;
+
+    document.getElementById("translationResult").innerText = "Translating...";
+
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=${encodeURIComponent(text)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const result = await response.json();
+        let translatedText = "";
+        
+        if (result && result[0]) {
+            for (let i = 0; i < result[0].length; i++) {
+                translatedText += result[0][i][0];
+            }
+        }
+
+        document.getElementById("translationResult").innerText = translatedText || "No translation returned.";
+    } catch (err) {
+        console.error(err);
+        document.getElementById("translationResult").innerText = "Translation service unavailable.";
+    }
+}
+
+function speakEnglish() {
+    const text = inputText.value.trim();
+    if (!text) return;
+    
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    speechSynthesis.speak(utterance);
+}
+
+function playPronunciation() {
+    if (currentAudioUrl) {
+        const audio = new Audio(currentAudioUrl);
+        audio.play();
+        return;
+    }
+    if (currentWord) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(currentWord);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+    }
+}
+
+// Fetch IPA for an entire phrase
+async function fetchIpaForPhrase(phrase) {
+    const words = phrase.trim().split(/\s+/);
+    const ipaPromises = words.map(async (word) => {
+        const cleanWord = word.replace(/[^\w']/g, "").toLowerCase();
+        if (!cleanWord) return word;
+        try {
+            const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
+            if (!res.ok) return cleanWord; // Fallback to normal text if not in dictionary
+            const data = await res.json();
+            let ipa = data[0]?.phonetic || "";
+            if (!ipa && data[0]?.phonetics) {
+                const phonetic = data[0].phonetics.find(p => p.text);
+                ipa = phonetic?.text || "";
+            }
+            return ipa ? ipa : cleanWord;
+        } catch(e) {
+            return cleanWord;
+        }
+    });
+    
+    const ipaWords = await Promise.all(ipaPromises);
+    return ipaWords.join(" ");
+}
+
+// New Feature: Voice Typing (Speech to Text)
+function startDictation() {
+    if (window.hasOwnProperty('webkitSpeechRecognition') || window.hasOwnProperty('SpeechRecognition')) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = "en-US";
+
+        recognition.start();
+        inputText.placeholder = "Listening... Speak now!";
+        
+        const ipaBox = document.getElementById("spokenIpaResult");
+        ipaBox.style.display = "block";
+        ipaBox.innerHTML = `<span class="loading">Listening...</span>`;
+
+        recognition.onresult = async function(e) {
+            const transcript = e.results[0][0].transcript;
+            inputText.value += (inputText.value ? " " : "") + transcript;
+            inputText.placeholder = "Type English text here...";
+            
+            // Show loading status for IPA translation
+            ipaBox.innerHTML = `<span class="loading">Generating IPA...</span>`;
+            
+            // Trigger translation and dictionary
+            const firstWord = transcript.trim().split(/\s+/)[0].replace(/[^\w']/g, "").toLowerCase();
+            lookupDictionary(firstWord);
+            translateText();
+            
+            // Generate and display IPA for the spoken sentence
+            const phraseIpa = await fetchIpaForPhrase(transcript);
+            ipaBox.innerHTML = `<strong>Spoken IPA:</strong> / ${phraseIpa} /`;
+        };
+
+        recognition.onerror = function(e) {
+            console.error(e);
+            inputText.placeholder = "Error listening. Type English text here...";
+            const ipaBox = document.getElementById("spokenIpaResult");
+            ipaBox.innerHTML = `<span class="error">Microphone error. Try again.</span>`;
+        };
+    } else {
+        alert("Voice typing is not supported in this browser. Try Chrome or Edge.");
+    }
+}
+
+// New Feature: Clear Text
+function clearText() {
+    inputText.value = "";
+    document.getElementById("translationResult").innerText = "";
+    document.getElementById("dictionaryResult").innerHTML = "Start typing or double-click a word...";
+    document.getElementById("pronounceBtn").style.display = "none";
+    document.getElementById("spokenIpaResult").style.display = "none";
+    activeLookupWord = "";
+}
+
+// New Feature: Copy Translation
+function copyTranslation() {
+    // We use document.execCommand as a fallback for iFrames, but standard clipboard API works well usually
+    const textToCopy = document.getElementById("translationResult").innerText;
+    if (!textToCopy || textToCopy === "Translating...") return;
+    
+    // Copy logic
+    const tempTextArea = document.createElement("textarea");
+    tempTextArea.value = textToCopy;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempTextArea);
+
+    // Visual feedback
+    const copyBtn = document.querySelector('.card:nth-child(2) .icon-btn');
+    const originalText = copyBtn.innerText;
+    copyBtn.innerText = "✅";
+    setTimeout(() => { copyBtn.innerText = originalText; }, 2000);
+}
+</script>
+
+</body>
+</html>
