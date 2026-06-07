@@ -604,6 +604,9 @@ function startDictation() {
         recognition.interimResults = false;
         recognition.lang = "en-US";
 
+        // Track whether we got a result so onend knows what to show
+        let gotResult = false;
+
         recognition.start();
         inputText.placeholder = "Listening... Speak now!";
         
@@ -612,9 +615,9 @@ function startDictation() {
         ipaBox.innerHTML = `<span class="loading">Listening...</span>`;
 
         recognition.onresult = async function(e) {
+            gotResult = true;
             const transcript = e.results[0][0].transcript;
             inputText.value += (inputText.value ? " " : "") + transcript;
-            inputText.placeholder = "Type English text here...";
             
             // Show loading status for IPA translation
             ipaBox.innerHTML = `<span class="loading">Generating IPA...</span>`;
@@ -630,10 +633,32 @@ function startDictation() {
         };
 
         recognition.onerror = function(e) {
-            console.error(e);
-            inputText.placeholder = "Error listening. Type English text here...";
-            const ipaBox = document.getElementById("spokenIpaResult");
-            ipaBox.innerHTML = `<span class="error">Microphone error. Try again.</span>`;
+            // 'no-speech' means the mic worked but nothing was said — not a real error
+            // 'aborted' happens when recognition ends normally — not a real error
+            if (e.error === 'no-speech') {
+                ipaBox.innerHTML = `<span class="loading">No speech detected. Try again.</span>`;
+                return;
+            }
+            if (e.error === 'aborted') {
+                // Silently ignore — recognition was stopped intentionally
+                return;
+            }
+            // Real errors: 'not-allowed', 'audio-capture', 'network', etc.
+            console.error('Speech recognition error:', e.error);
+            ipaBox.innerHTML = `<span class="error">Microphone error (${e.error}). Check permissions and try again.</span>`;
+        };
+
+        recognition.onend = function() {
+            // Always restore the placeholder when recognition session ends
+            inputText.placeholder = "Type English text here...";
+            if (!gotResult) {
+                // If no result and no error message was set, hide the IPA box
+                setTimeout(() => {
+                    if (ipaBox.querySelector('.loading')) {
+                        ipaBox.style.display = "none";
+                    }
+                }, 1500);
+            }
         };
     } else {
         alert("Voice typing is not supported in this browser. Try Chrome or Edge.");
