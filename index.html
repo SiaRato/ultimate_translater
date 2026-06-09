@@ -200,9 +200,29 @@ button:hover {
     transition: all 0.3s ease;
 }
 
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
 .word {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(45deg, var(--primary), var(--collocation));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    margin-bottom: 5px;
 }
 
 .ipa {
@@ -472,17 +492,18 @@ async function lookupDictionary(targetWord) {
 
             bgbData.forEach(item => {
                 if (!stopWords.has(item.word.toLowerCase()) && /^[a-z]+$/.test(item.word)) {
-                    validCombos.push(`${item.word} ${wordToSearch}`);
+                    validCombos.push({ text: `${item.word} ${wordToSearch}`, score: item.score });
                 }
             });
 
             bgaData.forEach(item => {
                 if (!stopWords.has(item.word.toLowerCase()) && /^[a-z]+$/.test(item.word)) {
-                    validCombos.push(`${wordToSearch} ${item.word}`);
+                    validCombos.push({ text: `${wordToSearch} ${item.word}`, score: item.score });
                 }
             });
 
-            collocations = [...new Set(validCombos)].slice(0, 6);
+            validCombos.sort((a, b) => b.score - a.score);
+            collocations = [...new Set(validCombos.map(c => c.text))].slice(0, 6);
         } catch (err) {
             console.error("Could not fetch collocations", err);
         }
@@ -597,7 +618,7 @@ async function fetchIpaForPhrase(phrase) {
 
 // New Feature: Voice Typing (Speech to Text)
 function startDictation() {
-    if (window.hasOwnProperty('webkitSpeechRecognition') || window.hasOwnProperty('SpeechRecognition')) {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
 
